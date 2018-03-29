@@ -20,7 +20,7 @@ public interface WordDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertAll(Word... words);
 
-    @Delete
+    @Query("DELETE FROM word_table")
     void deleteAll();
 
     @Update
