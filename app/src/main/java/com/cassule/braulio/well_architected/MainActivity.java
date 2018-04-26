@@ -28,7 +28,7 @@ import static com.cassule.braulio.well_architected.database.WordDatabase.INSTANC
 public class MainActivity extends AppCompatActivity {
 
     private WordViewModel wordViewModel;
-    WordListAdapter adapter;
+    WordListAdapter adapter = new WordListAdapter(this);
 
     private static RoomDatabase.Callback roomDatabaseCallback = new RoomDatabase.Callback(){
         @Override
@@ -54,11 +54,10 @@ public class MainActivity extends AppCompatActivity {
         });
 
         RecyclerView recyclerView = findViewById(R.id.recyclerview);
-        adapter = new WordListAdapter(this);
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

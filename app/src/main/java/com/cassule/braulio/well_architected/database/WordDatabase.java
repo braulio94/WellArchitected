@@ -5,6 +5,7 @@ import android.arch.persistence.room.Database;
 import android.arch.persistence.room.Room;
 import android.arch.persistence.room.RoomDatabase;
 import android.content.Context;
+import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 
 /**
@@ -25,5 +26,32 @@ public abstract class WordDatabase extends RoomDatabase {
             }
         }
         return INSTANCE;
+    }
+
+    private static RoomDatabase.Callback roomDatabaseCallback = new RoomDatabase.Callback(){
+        @Override
+        public void onOpen(@NonNull SupportSQLiteDatabase db) {
+            super.onOpen(db);
+            new PopulateDbAsync(INSTANCE).execute();
+        }
+    };
+
+    private static class PopulateDbAsync extends AsyncTask<Void, Void, Void> {
+
+        private final WordDao mDao;
+
+        PopulateDbAsync(WordDatabase db) {
+            this.mDao = db.wordDao();
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            mDao.deleteAll();
+            for (int i = 0; i < 3; i++){
+                Word word = new Word("Hello" + i);
+                mDao.insert(word);
+            }
+            return null;
+        }
     }
 }
