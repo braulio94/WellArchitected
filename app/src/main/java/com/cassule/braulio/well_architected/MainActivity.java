@@ -15,8 +15,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.view.Menu;
-import android.view.MenuItem;
 
 import com.cassule.braulio.well_architected.database.Word;
 import com.cassule.braulio.well_architected.database.WordDao;
@@ -82,9 +80,9 @@ public class MainActivity extends AppCompatActivity {
         protected Void doInBackground(Void... voids) {
             wordDao.deleteAll();
             Word word = new Word("Hello");
-            wordDao.insertAll(word);
+            wordDao.insert(word);
             word = new Word("World");
-            wordDao.insertAll(word);
+            wordDao.insert(word);
             return null;
         }
     }

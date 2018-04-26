@@ -22,7 +22,7 @@ public class WordRepository {
     public WordRepository(Application application) {
         WordDatabase db = WordDatabase.getDatabase(application);
         this.wordDao = db.wordDao();
-        this.words = wordDao.getAll();
+        this.words = wordDao.getAllWords();
     }
 
     public LiveData<List<Word>> getAllWords() {
@@ -30,20 +30,20 @@ public class WordRepository {
     }
 
     public void insert(Word word) {
-        new InsertAsyncTask(wordDao).execute(word);
+        new insertAsyncTask(wordDao).execute(word);
     }
 
-    private static class InsertAsyncTask extends AsyncTask<Word, Void, Void> {
+    private static class insertAsyncTask extends AsyncTask<Word, Void, Void> {
 
         private  WordDao mAsyncTaskDao;
 
-        public InsertAsyncTask(WordDao wordDao) {
+        insertAsyncTask(WordDao wordDao) {
             this.mAsyncTaskDao = wordDao;
         }
 
         @Override
-        protected Void doInBackground(Word... words) {
-            mAsyncTaskDao.insertAll(words);
+        protected Void doInBackground(final Word... words) {
+            mAsyncTaskDao.insert(words[0]);
             return null;
         }
     }
