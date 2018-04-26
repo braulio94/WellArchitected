@@ -21,7 +21,7 @@ public abstract class WordDatabase extends RoomDatabase {
         if (INSTANCE == null){
             synchronized (WordDatabase.class){
                 if (INSTANCE == null){
-                    INSTANCE = Room.databaseBuilder(context, WordDatabase.class, "word_database").build();
+                    INSTANCE = Room.databaseBuilder(context, WordDatabase.class, "word_database").addCallback(roomDatabaseCallback).build();
                 }
             }
         }
@@ -46,10 +46,10 @@ public abstract class WordDatabase extends RoomDatabase {
 
         @Override
         protected Void doInBackground(Void... voids) {
-            mDao.deleteAll();
-            for (int i = 0; i < 3; i++){
-                Word word = new Word("Hello" + i);
-                mDao.insert(word);
+            if (mDao.getAllWords().getValue() != null){
+                for (Word word: mDao.getAllWords().getValue()){
+                    mDao.insert(word);
+                }
             }
             return null;
         }

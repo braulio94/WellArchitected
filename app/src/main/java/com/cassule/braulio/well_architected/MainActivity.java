@@ -31,15 +31,19 @@ public class MainActivity extends AppCompatActivity {
 
     private WordViewModel wordViewModel;
     private static final int NEW_WORD_ACTIVITY_REQUEST_CODE = 1;
-    WordListAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        adapter = new WordListAdapter(this);
+        final WordListAdapter adapter = new WordListAdapter(this);
+
+        RecyclerView recyclerView = findViewById(R.id.recyclerview);
+        recyclerView.setAdapter(adapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
         wordViewModel = ViewModelProviders.of(this).get(WordViewModel.class);
         wordViewModel.getAllWords().observe(this, new Observer<List<Word>>() {
             @Override
@@ -48,18 +52,12 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        RecyclerView recyclerView = findViewById(R.id.recyclerview);
-        recyclerView.setAdapter(adapter);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivityForResult(
-                        new Intent(MainActivity.this, NewWordActivity.class),
-                        NEW_WORD_ACTIVITY_REQUEST_CODE
-                );
+                Intent intent = new Intent(MainActivity.this, NewWordActivity.class);
+                startActivityForResult(intent, NEW_WORD_ACTIVITY_REQUEST_CODE);
             }
         });
     }
@@ -67,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == NEW_WORD_ACTIVITY_REQUEST_CODE && requestCode == RESULT_OK){
+        if (requestCode == NEW_WORD_ACTIVITY_REQUEST_CODE && resultCode == RESULT_OK) {
             Word word = new Word(data.getStringExtra(NewWordActivity.EXTRA_REPLY));
             wordViewModel.insert(word);
         } else {
