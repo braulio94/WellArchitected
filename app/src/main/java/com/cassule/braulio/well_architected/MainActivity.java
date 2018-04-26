@@ -4,6 +4,7 @@ import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.arch.persistence.db.SupportSQLiteDatabase;
 import android.arch.persistence.room.RoomDatabase;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -15,6 +16,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.Toast;
 
 import com.cassule.braulio.well_architected.database.Word;
 import com.cassule.braulio.well_architected.database.WordDao;
@@ -28,15 +30,8 @@ import static com.cassule.braulio.well_architected.database.WordDatabase.INSTANC
 public class MainActivity extends AppCompatActivity {
 
     private WordViewModel wordViewModel;
-    WordListAdapter adapter = new WordListAdapter(this);
-
-    private static RoomDatabase.Callback roomDatabaseCallback = new RoomDatabase.Callback(){
-        @Override
-        public void onOpen(@NonNull SupportSQLiteDatabase db) {
-            super.onOpen(db);
-            new PopulateDbAsync(INSTANCE).execute();
-        }
-    };
+    private static final int NEW_WORD_ACTIVITY_REQUEST_CODE = 1;
+    WordListAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
+        adapter = new WordListAdapter(this);
         wordViewModel = ViewModelProviders.of(this).get(WordViewModel.class);
         wordViewModel.getAllWords().observe(this, new Observer<List<Word>>() {
             @Override
@@ -61,28 +56,22 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                startActivityForResult(
+                        new Intent(MainActivity.this, NewWordActivity.class),
+                        NEW_WORD_ACTIVITY_REQUEST_CODE
+                );
             }
         });
     }
 
-    private static class PopulateDbAsync extends AsyncTask<Void, Void, Void> {
-
-        private final WordDao wordDao;
-
-        public PopulateDbAsync(WordDatabase database) {
-            this.wordDao = database.wordDao();
-        }
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-            wordDao.deleteAll();
-            Word word = new Word("Hello");
-            wordDao.insert(word);
-            word = new Word("World");
-            wordDao.insert(word);
-            return null;
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == NEW_WORD_ACTIVITY_REQUEST_CODE && requestCode == RESULT_OK){
+            Word word = new Word(data.getStringExtra(NewWordActivity.EXTRA_REPLY));
+            wordViewModel.insert(word);
+        } else {
+            Toast.makeText(this, R.string.empty_not_saved, Toast.LENGTH_LONG).show();
         }
     }
 }

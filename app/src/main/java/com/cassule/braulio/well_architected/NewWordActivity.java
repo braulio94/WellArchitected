@@ -32,6 +32,7 @@ public class NewWordActivity extends AppCompatActivity {
                     replyIntent.putExtra(EXTRA_REPLY, word);
                     setResult(RESULT_OK, replyIntent);
                 }
+                finish();
             }
         });
     }
